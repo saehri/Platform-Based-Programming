@@ -7,7 +7,7 @@ const jsonParser = bodyParser.json();
 
 // GET /
 router.get('/', (req, res) => {
-  db.query('SELECT * FROM mahasiswa', (error, result) => {
+  db.query('SELECT * FROM students', (error, result) => {
     if (error) {
       console.log('🔴 Error fetching data', error);
       res.status(500).json({message: error});
@@ -21,7 +21,7 @@ router.get('/', (req, res) => {
 router.get('/:nim', (req, res) => {
   const studentId = req.params.nim;
   db.query(
-    'SELECT * FROM mahasiswa where nim = ?',
+    'SELECT * FROM students where nim = ?',
     [studentId],
     (error, result) => {
       if (error) {
@@ -38,19 +38,19 @@ router.get('/:nim', (req, res) => {
   );
 });
 
-// PUT /mahasiswa/:nim
+// PUT /students/:nim
 router.put('/:nim', (req, res) => {
   const studentId = req.params.nim;
   const {nama, gender, prodi, alamat} = req.body;
   db.query(
-    'UPDATE mahasiswa SET nama = ?, gender = ?, prodi = ?, alamat =?, WHERE nim = ?',
+    'UPDATE students SET nama = ?, gender = ?, prodi = ?, alamat =?, WHERE nim = ?',
     [nama, gender, prodi, alamat, studentId],
     (error) => {
       if (error) {
-        console.error('Error updating mahasiswa:', error);
+        console.error('Error updating students:', error);
         res.status(500).json({message: 'Internal server error'});
       } else {
-        res.json('Updating mahasiswa successfully!');
+        res.json('Updating students successfully!');
       }
     }
   );
@@ -59,26 +59,23 @@ router.put('/:nim', (req, res) => {
 // DELETE /:nim
 router.delete('/:nim', (req, res) => {
   const studentId = req.params.nim;
-  db.query(
-    `DELETE FROM mahasiswa WHERE nim = ${studentId}`,
-    (error, result) => {
-      if (error) {
-        console.error('Failed to delete data with id:', studentId);
-        res.status(500).json({message: 'Internal server error!'});
-      } else {
-        res.json(
-          'Successfully deleted student with id:',
-          studentId,
-          result.affectedRows
-        );
-      }
+  db.query(`DELETE FROM students WHERE nim = ${studentId}`, (error, result) => {
+    if (error) {
+      console.error('Failed to delete data with id:', studentId);
+      res.status(500).json({message: 'Internal server error!'});
+    } else {
+      res.json(
+        'Successfully deleted student with id:',
+        studentId,
+        result.affectedRows
+      );
     }
-  );
+  });
 });
 
 router.post('/new', jsonParser, (req, res) => {
   const {nim, nama, gender, prodi, alamat} = req.body;
-  const queryText = `INSERT INTO mahasiswa (nim, nama, gender, prodi, alamat) VALUES ("${nim}", "${nama}", "${gender}", "${prodi}", "${alamat}")`;
+  const queryText = `INSERT INTO students (nim, nama, gender, prodi, alamat) VALUES ("${nim}", "${nama}", "${gender}", "${prodi}", "${alamat}")`;
 
   db.query(queryText, (err, results, fields) => {
     if (err) {
